@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="100%" height="100%" fill="#fff0ea" rx="24" />
+  <!-- かわいいパンのイラスト（シンプル） -->
+  <g transform="translate(150,140)">
+    <ellipse cx="150" cy="160" rx="150" ry="110" fill="#ffdab1" stroke="#ffb57a" stroke-width="6" />
+    <!-- かぶせのライン -->
+    <path d="M20,140 C60,40 240,40 280,140" fill="#ffd8a8" stroke="#ffb57a" stroke-width="4" />
+
+    <!-- 目 -->
+    <g fill="#5a3b2e">
+      <circle cx="110" cy="140" r="10" />
+      <circle cx="190" cy="140" r="10" />
+    </g>
+    <!-- ほっぺ -->
+    <g fill="#ffb7b7" opacity="0.9">
+      <ellipse cx="100" cy="170" rx="18" ry="12" />
+      <ellipse cx="200" cy="170" rx="18" ry="12" />
+    </g>
+    <!-- 口 -->
+    <path d="M130,170 q20,20 40,0" stroke="#5a3b2e" stroke-width="6" fill="none" stroke-linecap="round" />
+  </g>
+
+  <g transform="translate(20,460)">
+    <text x="0" y="0" font-family="'Noto Sans JP', sans-serif" font-size="18" fill="#aa7a5a">矢部パン関屋店</text>
+  </g>
+</svg>
