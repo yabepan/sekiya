@@ -1,68 +1,141 @@
-<script type="module">
-    const firebaseConfig = {
-        apiKey: "AIzaSyAB4u16RPa3VCYhu1ZNeC-H9fuv7sRY0uI",
-        authDomain: "mito-be388.firebaseapp.com",
-        projectId: "mito-be388",
-        storageBucket: "mito-be388.firebasestorage.app",
-        messagingSenderId: "959045440758",
-        appId: "1:959045440758:web:b35177b5942371376a08d7",
-        measurementId: "G-GZF5M958CF"
-    };
+<!DOCTYPE html>
+<html lang="ja">
 
-    import { initializeApp } from
-        "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+<head>
+    <meta charset="UTF-8">
+    <title>カウントアップゲーム</title>
+</head>
 
-    import {
-          getFirestore,
-          doc,
-          onSnapshot,
-          updateDoc,
-          runTransaction
-    } from
-        "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+<body>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    <h1>現在の数字</h1>
 
-    const gameRef = doc(db, "game", "state");
+    <h2 id="number">読込中...</h2>
 
-    onSnapshot(gameRef, (snapshot) => {
+    <div>
+        <label for="name">名前</label>
+        <input id="name">
+    </div>
 
-        document.getElementById("number").textContent =
-            snapshot.data().currentNumber;
+    <br>
 
-    });
+    <div>
+        <label for="next">次の数字</label>
+        <input id="next" type="number">
+    </div>
 
-    await runTransaction(db,
-        async (transaction) => {
+    <br>
 
-            const snap =
-                await transaction.get(gameRef);
+    <button id="send">
+        送信
+    </button>
 
-            const current =
-                snap.data().currentNumber;
+    <p id="message"></p>
 
-            if (next !== current + 1) {
-                throw "失敗";
+    <script type="module">
+
+        import { initializeApp }
+            from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+        import {
+            getFirestore,
+            doc,
+            onSnapshot,
+            runTransaction
+        }
+            from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyAB4u16RPa3VCYhu1ZNeC-H9fuv7sRY0uI",
+            authDomain: "mito-be388.firebaseapp.com",
+            projectId: "mito-be388",
+            storageBucket: "mito-be388.firebasestorage.app",
+            messagingSenderId: "959045440758",
+            appId: "1:959045440758:web:b35177b5942371376a08d7",
+            measurementId: "G-GZF5M958CF"
+
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const gameRef = doc(db, "game", "state");
+
+        onSnapshot(gameRef, (snapshot) => {
+
+            if (!snapshot.exists()) {
+                document.getElementById("message").textContent =
+                    "game/state が存在しません";
+                return;
             }
 
-            transaction.update(
-                gameRef,
-                {
-                    currentNumber: next
-                }
-            );
+            const data = snapshot.data();
+
+            document.getElementById("number").textContent =
+                data.currentNumber;
+
         });
 
-</script>
+        document.getElementById("send")
+            .addEventListener("click", async () => {
 
-<h1 id="number">0</h1>
+                const name =
+                    document.getElementById("name").value.trim();
 
-<label for="name">name</label>
-<input id="name">
-<label for="next">next</label>
-<input id="next">
+                const next =
+                    Number(document.getElementById("next").value);
 
-<button id="send">
-    送信
-</button>
+                if (!name) {
+                    alert("名前を入力してください");
+                    return;
+                }
+
+                try {
+
+                    await runTransaction(
+                        db,
+                        async (transaction) => {
+
+                            const snap =
+                                await transaction.get(gameRef);
+
+                            const current =
+                                snap.data().currentNumber;
+
+                            if (next !== current + 1) {
+                                throw new Error(
+                                    "次の数字ではありません"
+                                );
+                            }
+
+                            transaction.update(
+                                gameRef,
+                                {
+                                    currentNumber: next,
+                                    lastUser: name
+                                }
+                            );
+                        }
+                    );
+
+                    document.getElementById("message")
+                        .textContent =
+                        "登録成功";
+
+                }
+                catch (err) {
+
+                    document.getElementById("message")
+                        .textContent =
+                        "登録失敗 : " + err.message;
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>
