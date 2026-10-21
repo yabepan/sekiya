@@ -1,0 +1,66 @@
+<script type="module">
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB4u16RPa3VCYhu1ZNeC-H9fuv7sRY0uI",
+        authDomain: "mito-be388.firebaseapp.com",
+        projectId: "mito-be388",
+        storageBucket: "mito-be388.firebasestorage.app",
+        messagingSenderId: "959045440758",
+        appId: "1:959045440758:web:b35177b5942371376a08d7",
+        measurementId: "G-GZF5M958CF"
+    };
+
+    import { initializeApp } from
+        "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+    import {
+        getFirestore,
+        doc,
+        onSnapshot
+    } from
+        "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const gameRef = doc(db, "game", "state");
+
+    onSnapshot(gameRef, (snapshot) => {
+
+        document.getElementById("number").textContent =
+            snapshot.data().currentNumber;
+
+    });
+
+    await runTransaction(db,
+        async (transaction) => {
+
+            const snap =
+                await transaction.get(gameRef);
+
+            const current =
+                snap.data().currentNumber;
+
+            if (next !== current + 1) {
+                throw "失敗";
+            }
+
+            transaction.update(
+                gameRef,
+                {
+                    currentNumber: next
+                }
+            );
+        });
+
+</script>
+
+<h1 id="number">0</h1>
+
+<label for="name">name</label>
+<input id="name">
+<label for="next">next</label>
+<input id="next">
+
+<button id="send">
+    送信
+</button>
