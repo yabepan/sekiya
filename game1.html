@@ -1,0 +1,172 @@
+<style>
+    :root {
+        --bg: #f5f7ff;
+        --card: #ffffff;
+        --primary: #4f46e5;
+        --primary-dark: #3730a3;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #dbe3f0;
+        --shadow: rgba(79, 70, 229, 0.12);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #eef2ff, #f8fafc);
+        color: var(--text);
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .game-box {
+        width: min(420px, 90vw);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 16px 40px var(--shadow);
+        padding: 32px 24px;
+        text-align: center;
+    }
+
+    #number {
+        margin: 0 0 24px;
+        font-size: clamp(3rem, 8vw, 5rem);
+        line-height: 1;
+        color: var(--primary);
+        letter-spacing: 0.08em;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 14px;
+    }
+
+    label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--muted);
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #f9fafb;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+    }
+
+    button {
+        width: 100%;
+        margin-top: 18px;
+        padding: 14px 18px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+</style>
+
+<script type="module">
+    const firebaseConfig = {
+        apiKey: "AIzaSyAB4u16RPa3VCYhu1ZNeC-H9fuv7sRY0uI",
+        authDomain: "mito-be388.firebaseapp.com",
+        projectId: "mito-be388",
+        storageBucket: "mito-be388.firebasestorage.app",
+        messagingSenderId: "959045440758",
+        appId: "1:959045440758:web:b35177b5942371376a08d7",
+        measurementId: "G-GZF5M958CF"
+    };
+
+    import { initializeApp } from
+        "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+    import {
+          getFirestore,
+          doc,
+          onSnapshot,
+          updateDoc,
+          runTransaction
+    } from
+        "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const gameRef = doc(db, "game", "state");
+
+    onSnapshot(gameRef, (snapshot) => {
+
+        document.getElementById("number").textContent =
+            snapshot.data().currentNumber;
+
+    });
+
+    await runTransaction(db,
+        async (transaction) => {
+
+            const snap =
+                await transaction.get(gameRef);
+
+            const current =
+                snap.data().currentNumber;
+
+            if (next !== current + 1) {
+                throw "失敗";
+            }
+
+            transaction.update(
+                gameRef,
+                {
+                    currentNumber: next
+                }
+            );
+        });
+
+</script>
+
+<div class="game-box">
+    <h1 id="number">0</h1>
+
+    <div class="field">
+        <label for="name">name</label>
+        <input id="name">
+    </div>
+
+    <div class="field">
+        <label for="next">next</label>
+        <input id="next">
+    </div>
+
+    <button id="send">送信</button>
+</div>
